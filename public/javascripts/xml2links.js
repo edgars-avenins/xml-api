@@ -1,21 +1,34 @@
+const { raw } = require("express")
 
 function dataFilter(rawData, url, callback){
-    console.log(rawData.text)
+    // console.log('Body\n\n\/',rawData.body.length)
+    // console.log('Text\n\n\/',rawData.text.length)
+
+    let reqData = ''
+
+    if(rawData.text === undefined){
+        reqData = rawData.body
+    }else if(rawData.body.length ==  undefined){
+        reqData = rawData.text
+    }else{
+        console.log('No data')
+        callback('Response has no data',null)
+    }
+
     let dataArray = []
-    if(rawData.text.includes('<loc>')){
-        if(rawData.text){
-            dataArray = rawData.text.split(/<loc>(.*?)<\/loc>/)
+    if(reqData.includes('<loc>')){
+        if(reqData.text){
+            dataArray = reqData.split(/<loc>(.*?)<\/loc>/)
         }else{
-            dataArray = rawData.body.toString().split(/<loc>(.*?)<\/loc>/)
+            dataArray = reqData.toString().split(/<loc>(.*?)<\/loc>/)
         }
     }else{
-        dataArray = rawData.text.split(/\/\n/)
+        dataArray = reqData.split(/\/\n/)
     }
     dataArray = dataArray.filter(item => !item.includes('<'))
-    console.log(dataArray)
     let filter = { }
     let isXML = false
-
+    
     dataArray = dataArray.filter(item => {
         filterItem = item.split(/(.*?)\//)
         for(let i = 0; i < filterItem.length; i++){
@@ -80,24 +93,26 @@ function dataFilter(rawData, url, callback){
         return item
     })
     
-
-
+    
+    
     data = {
         dataArray: dataArray,
         filter: filter,
         categorizedFilter: doneFilter,
         isXML: isXML
     }
-
-    callback(data)
+    
+    console.log('data',data)
+    callback(null,data)
 }
 
 function getSitemapLink(robotsTxt, callback){
-    
-    callback(robotsTxt.text
-        .split('\n')
-        .filter(item => item.includes('sitemap'))
-        .map(item => item.slice(item.indexOf('https'))))
+    data = robotsTxt.text
+    .split('\n')
+    .filter(item => item.includes('sitemap'))
+    .map(item => item.slice(item.indexOf('https')))
+
+    callback(null,data)
 }
 
 function validateUrl(url){
