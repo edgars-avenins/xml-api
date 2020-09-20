@@ -20,20 +20,7 @@ function XMLOrSitemap(req, res) {
         if(err) res.status(400).json(err)
 
         if(filteredData.length === 1){
-        request.get(filteredData[0])
-          .then(xml => fn.dataFilter(xml, filteredData[0], (err, links) => {
-//refactor into recursive function ???
-            if(links.isXML){
-                request.get(links.dataArray[0])
-                .then(xml => fn.dataFilter(xml, filteredData[0], (err, links) => { 
-                  res.status(200).json({links: links})
-                }))
-
-            }else{
-                res.status(200).json({links: links})
-            }
-          }))
-
+          recOpenSitemaps(filteredData, res)
         }else if(filteredData.length === 0){
             res.status(301).json({text: 'no sitemaps found...'})
 
@@ -57,6 +44,20 @@ function AllSiteMaps(req, res) {
     const validUrl = fn.validateUrl(req.body.url)
     
 
+}
+
+function recOpenSitemaps(data, res, sitemap = [data[0]]) {
+  request.get(data[0])
+    .then(xml => fn.dataFilter(xml, data[0], (err, links) => {
+    //refactor into recursive function ???
+      if(links.isXML){
+        sitemap.push(links.dataArray[0])
+        recOpenSitemaps(links.dataArray, res, sitemap)
+      }else{
+        links.sitemapTree = sitemap
+        res.status(200).json({links: links})
+      }
+    }))
 }
 
 
