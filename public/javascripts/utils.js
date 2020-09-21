@@ -1,6 +1,8 @@
 const request = require('superagent')
 const fn = require('./xml2links')
 
+//draw it out and start breaking it down. Too much potential for code reusability, hard to keep track in mind!
+
 function XML(req, res) {
   const validUrl = fn.validateUrl(req.body.url)
 
@@ -16,20 +18,7 @@ function XMLOrSitemap(req, res) {
   const validUrl = fn.validateUrl(req.body.url)
 
   request.get(`${validUrl}robots.txt`)
-    .then(roboData => fn.getSitemapLink(roboData, (err, filteredData) => {
-      if (err) res.status(400).json(err)
-
-      if (filteredData.length === 1) {
-        recOpenSitemaps(filteredData, res)
-      } else if (req.params.full === 'full' && filteredData.length > 1) {
-        recOpenAllSitemaps(filteredData, res)
-      } else if (filteredData.length === 0) {
-        res.status(301).json({ text: 'no sitemaps found...' })
-
-      } else {
-        res.status(200).json({ sitemaps: filteredData })
-      }
-    }))
+    .then(roboData => fn.getSitemapLink(roboData, (err, filteredData) => handleResponse(err, filteredData, req, res)))
     .catch(() => {
       request.get(`${validUrl}sitemap.xml`)
         .then(data => fn.dataFilter(data, filteredData[0], (err, links) => {
@@ -42,8 +31,22 @@ function XMLOrSitemap(req, res) {
     })
 }
 
+function handleResponse(err, filteredData, req, res){
+  if (err) res.status(400).json(err)
+
+  if (filteredData.length === 1) {
+    recOpenSitemaps(filteredData, res)
+  } else if (req.params.full === 'full' && filteredData.length > 1) {
+    recOpenAllSitemaps(filteredData, res)
+  } else if (filteredData.length === 0) {
+    res.status(301).json({ text: 'no sitemaps found...' })
+
+  } else {
+    res.status(200).json({ sitemaps: filteredData })
+  }
+}
+
 function recOpenAllSitemaps(req, res) {
-  const validUrl = fn.validateUrl(req.body.url)
 
 
 }
