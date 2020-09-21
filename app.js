@@ -19,6 +19,9 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/api/v1', indexRouter);
+app.get('*', (req, res) => {
+  res.send('<h1>XML API</h1><p>use the following 2 endpoints in your app to get page sitemaps</p><p>https://robot-sitemap-api.herokuapp.com/api/v1/xml/ or <br> https://robot-sitemap-api.herokuapp.com/api/v1/xml/auto <br> with body e.g. {url: \'cnn.com\'}</p>')
+})
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
