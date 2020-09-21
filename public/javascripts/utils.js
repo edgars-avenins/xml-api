@@ -16,7 +16,7 @@ function XML(req, res) {
 
 function sitemap(req, res){
   request.get(req.body.url)
-    .then(data => fn.dataFilter(data, filteredData[0], (err, links) => {
+    .then(data => fn.dataFilter(data, req.body.url, (err, links) => {
       res.status(200).json({ links: links })
     }))
     .catch(err => {
