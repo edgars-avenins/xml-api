@@ -102,7 +102,6 @@ function dataFilter(rawData, url, callback){
         isXML: isXML
     }
     
-    console.log('data',data)
     callback(null,data)
 }
 
