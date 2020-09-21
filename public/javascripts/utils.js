@@ -47,8 +47,7 @@ function handleResponse(err, filteredData, req, res){
 }
 
 function recOpenAllSitemaps(req, res) {
-
-
+  res.status(404).json({title: "This functionality is in development"})
 }
 
 function recOpenSitemaps(data, res, sitemap = [data[0]]) {
