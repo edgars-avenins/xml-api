@@ -14,6 +14,17 @@ function XML(req, res) {
     .catch()
 }
 
+function sitemap(req, res){
+  request.get(req.body.url)
+    .then(data => fn.dataFilter(data, filteredData[0], (err, links) => {
+      res.status(200).json({ links: links })
+    }))
+    .catch(err => {
+      console.log('Error\n\n\n\nBad request', err)
+      res.status(err.status).json({ err: err.response })
+    })
+}
+
 function XMLOrSitemap(req, res) {
   const validUrl = fn.validateUrl(req.body.url)
 
@@ -67,5 +78,6 @@ function recOpenSitemaps(data, res, sitemap = [data[0]]) {
 
 module.exports = {
   XML,
-  XMLOrSitemap
+  XMLOrSitemap,
+  sitemap
 }
